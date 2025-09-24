@@ -9,6 +9,7 @@ import { processFormData } from "./lib/utils.js";
 import { initTable } from "./components/table.js";
 import { initPagination } from "./components/pagination.js";
 import { initSorting } from "./components/sorting.js";
+import { initFiltering } from "./components/filtering.js";
 
 // Исходные данные, используемые в render()
 const { data, ...indexes } = initData(sourceData);
@@ -37,6 +38,9 @@ function render(action) {
   let state = collectState(); // состояние полей из таблицы
   let result = [...data]; // копируем данные для изменения
 
+  // Применяем фильтрацию
+  result = applyFiltering(result, state, action);
+
   // Применяем сортировку
   result = applySorting(result, state, action);
 
@@ -52,11 +56,16 @@ const sampleTable = initTable(
   {
     tableTemplate: "table",
     rowTemplate: "row",
-    before: ["header"], // шаблон заголовка таблицы
+    before: ["header", "filter"], // шаблон заголовка таблицы
     after: ["pagination"], // шаблон пагинации
   },
   render
 );
+
+const applyFiltering = initFiltering(sampleTable.filter.elements, {
+  // передаём элементы фильтра
+  searchBySeller: indexes.sellers,
+});
 
 // Инициализация сортировки (после создания таблицы)
 const applySorting = initSorting([
