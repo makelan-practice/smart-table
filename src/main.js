@@ -10,6 +10,7 @@ import { initTable } from "./components/table.js";
 import { initPagination } from "./components/pagination.js";
 import { initSorting } from "./components/sorting.js";
 import { initFiltering } from "./components/filtering.js";
+import { initSearching } from "./components/searching.js";
 
 // Исходные данные, используемые в render()
 const { data, ...indexes } = initData(sourceData);
@@ -38,6 +39,9 @@ function render(action) {
   let state = collectState(); // состояние полей из таблицы
   let result = [...data]; // копируем данные для изменения
 
+  // Применяем поиск
+  result = applySearching(result, state, action);
+
   // Применяем фильтрацию
   result = applyFiltering(result, state, action);
 
@@ -56,11 +60,14 @@ const sampleTable = initTable(
   {
     tableTemplate: "table",
     rowTemplate: "row",
-    before: ["header", "filter"], // шаблон заголовка таблицы
+    before: ["search", "header", "filter"], // шаблон заголовка таблицы
     after: ["pagination"], // шаблон пагинации
   },
   render
 );
+
+// Инициализация поиска
+const applySearching = initSearching("search");
 
 const applyFiltering = initFiltering(sampleTable.filter.elements, {
   // передаём элементы фильтра
